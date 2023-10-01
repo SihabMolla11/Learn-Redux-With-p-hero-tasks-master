@@ -1,7 +1,18 @@
-import { Menu, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
+import { Menu, Transition } from "@headlessui/react";
+import { signOut } from "firebase/auth";
+import { Fragment } from "react";
+import { useDispatch } from "react-redux";
+import { logOut } from "../../redux/features/user/userSlice";
+import auth from "../../utils/firebase.config";
 
 export default function MenuDropdown({ children }) {
+  const dispatch = useDispatch();
+
+  const handelLogout = () => {
+    signOut(auth);
+    dispatch(logOut());
+  };
+
   return (
     <Menu as="div" className="relative inline-block text-left bg-white z-[999]">
       <div>
@@ -19,34 +30,14 @@ export default function MenuDropdown({ children }) {
         <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="px-1 py-1">
             <Menu.Item>
-              {({ active }) => (
-                <button
-                  className={`${
-                    active ? 'bg-primary text-white' : 'text-gray-900'
-                  } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                >
-                  Profile
-                </button>
-              )}
+              {({ active }) => <button className={`${active ? "bg-primary text-white" : "text-gray-900"} group flex w-full items-center rounded-md px-2 py-2 text-sm`}>Profile</button>}
+            </Menu.Item>
+            <Menu.Item>
+              {({ active }) => <button className={`${active ? "bg-primary text-white" : "text-gray-900"} group flex w-full items-center rounded-md px-2 py-2 text-sm`}>Settings</button>}
             </Menu.Item>
             <Menu.Item>
               {({ active }) => (
-                <button
-                  className={`${
-                    active ? 'bg-primary text-white' : 'text-gray-900'
-                  } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                >
-                  Settings
-                </button>
-              )}
-            </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  className={`${
-                    active ? 'bg-primary text-white' : 'text-gray-900'
-                  } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                >
+                <button onClick={handelLogout} className={`${active ? "bg-primary text-white" : "text-gray-900"} group flex w-full items-center rounded-md px-2 py-2 text-sm`}>
                   Logout
                 </button>
               )}

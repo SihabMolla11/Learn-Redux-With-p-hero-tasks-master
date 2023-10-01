@@ -1,32 +1,45 @@
-import { useEffect, useState } from 'react';
-import loginImage from '../assets/image/login.svg';
-import { useForm, useWatch } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import loginImage from "../assets/image/login.svg";
+import { createUser } from "../redux/features/user/userSlice";
 
 const Signup = () => {
   const { handleSubmit, register, control } = useForm();
-  const password = useWatch({ control, name: 'password' });
-  const confirmPassword = useWatch({ control, name: 'confirmPassword' });
+  const password = useWatch({ control, name: "password" });
+  const confirmPassword = useWatch({ control, name: "confirmPassword" });
   const navigate = useNavigate();
   const [disabled, setDisabled] = useState(true);
 
+  const { isError, error, email, isLoading } = useSelector((state) => state.userSlice);
+
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    if (
-      password !== undefined &&
-      password !== '' &&
-      confirmPassword !== undefined &&
-      confirmPassword !== '' &&
-      password === confirmPassword
-    ) {
+    if (password !== undefined && password !== "" && confirmPassword !== undefined && confirmPassword !== "" && password === confirmPassword) {
       setDisabled(false);
     } else {
       setDisabled(true);
     }
   }, [password, confirmPassword]);
 
+  useEffect(() => {
+    if (isError && error) {
+      toast.error(error);
+    }
+  }, [error, isError]);
+
+  useEffect(() => {
+    if (!isLoading && email) {
+      toast.success("sing up success");
+      navigate("/");
+    }
+  }, [isLoading, navigate, email]);
+
   const onSubmit = ({ name, email, password }) => {
-    // Email Password signup
-    console.log(name, email, password);
+    dispatch(createUser({ email, password, name }));
   };
 
   const handleGoogleLogin = () => {
@@ -44,65 +57,34 @@ const Signup = () => {
           <form className="space-y-5 w-full" onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col items-start">
               <label htmlFor="email">Name</label>
-              <input
-                type="text"
-                id="name"
-                className="w-full rounded-md"
-                {...register('name')}
-              />
+              <input type="text" id="name" className="w-full rounded-md" {...register("name")} />
             </div>
             <div className="flex flex-col items-start">
               <label htmlFor="email">Email</label>
-              <input
-                type="email"
-                id="email"
-                className="w-full rounded-md"
-                {...register('email')}
-              />
+              <input type="email" id="email" className="w-full rounded-md" {...register("email")} />
             </div>
             <div className="flex flex-col items-start">
               <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                className="w-full rounded-md"
-                {...register('password')}
-              />
+              <input type="password" id="password" className="w-full rounded-md" {...register("password")} />
             </div>
             <div className="flex flex-col items-start">
               <label htmlFor="confirm-password">Confirm Password</label>
-              <input
-                type="password"
-                id="confirm-password"
-                className="w-full rounded-md"
-                {...register('confirmPassword')}
-              />
+              <input type="password" id="confirm-password" className="w-full rounded-md" {...register("confirmPassword")} />
             </div>
             <div className="!mt-8 ">
-              <button
-                type="submit"
-                className="btn btn-primary w-full disabled:bg-gray-300 disabled:cursor-not-allowed"
-                disabled={disabled}
-              >
+              <button type="submit" className="btn btn-primary w-full disabled:bg-gray-300 disabled:cursor-not-allowed" disabled={disabled}>
                 Sign up
               </button>
             </div>
             <div>
               <p>
-                Already have an account?{' '}
-                <span
-                  className="text-primary hover:underline cursor-pointer"
-                  onClick={() => navigate('/login')}
-                >
+                Already have an account?{" "}
+                <span className="text-primary hover:underline cursor-pointer" onClick={() => navigate("/login")}>
                   Login
                 </span>
               </p>
             </div>
-            <button
-              type="button"
-              className="btn btn-primary w-full"
-              onClick={handleGoogleLogin}
-            >
+            <button type="button" className="btn btn-primary w-full" onClick={handleGoogleLogin}>
               Login with Google
             </button>
           </form>

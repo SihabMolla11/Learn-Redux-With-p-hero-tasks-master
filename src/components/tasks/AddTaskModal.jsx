@@ -1,11 +1,18 @@
-import { useForm } from 'react-hook-form';
-import Modal from '../ui/Modal';
-import { useDispatch } from 'react-redux';
-import { addTask } from '../../redux/features/tasks/tasksSlice';
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import Modal from "../ui/Modal";
+import { useAddTaskMutation } from "../../redux/features/Api/tasksApi";
 
 const AddTaskModal = ({ isOpen, setIsOpen }) => {
   const { register, handleSubmit, reset } = useForm();
-  const dispatch = useDispatch();
+
+  const [addTask, { data, error }] = useAddTaskMutation();
+  console.log(data);
+  console.log(error);
+
+  if (data?.acknowledged === true && data?.insertedId) {
+    toast.success("new task added");
+  }
 
   const onCancel = () => {
     reset();
@@ -13,7 +20,7 @@ const AddTaskModal = ({ isOpen, setIsOpen }) => {
   };
 
   const onSubmit = (data) => {
-    dispatch(addTask(data));
+    addTask({ ...data, status: "pending" });
     onCancel();
   };
 
@@ -24,44 +31,25 @@ const AddTaskModal = ({ isOpen, setIsOpen }) => {
           <label htmlFor="title" className="mb-2">
             Title
           </label>
-          <input
-            className="w-full rounded-md"
-            type="text"
-            id="title"
-            {...register('title')}
-          />
+          <input className="w-full rounded-md" type="text" id="title" {...register("title")} />
         </div>
         <div className="flex flex-col mb-5">
           <label htmlFor="title" className="mb-2">
             Description
           </label>
-          <textarea
-            className="w-full rounded-md"
-            type="text"
-            id="description"
-            {...register('description')}
-          />
+          <textarea className="w-full rounded-md" type="text" id="description" {...register("description")} />
         </div>
         <div className="flex flex-col mb-5">
           <label htmlFor="title" className="mb-2">
             Deadline
           </label>
-          <input
-            className="w-full rounded-md"
-            type="date"
-            id="date"
-            {...register('date')}
-          />
+          <input className="w-full rounded-md" type="date" id="date" {...register("date")} />
         </div>
         <div className="flex flex-col mb-5">
           <label htmlFor="title" className="mb-2">
             Assign to
           </label>
-          <select
-            className="w-full rounded-md"
-            id="assignedTo"
-            {...register('assignedTo')}
-          >
+          <select className="w-full rounded-md" id="assignedTo" {...register("assignedTo")}>
             <option value="Mir Hussain">Mir Hussain</option>
             <option value="Mezba Abedin">Mezba Abedin</option>
             <option value="Nahid Hasan">Nahid Hasan</option>
@@ -81,11 +69,7 @@ const AddTaskModal = ({ isOpen, setIsOpen }) => {
           <label htmlFor="title" className="mb-2">
             Priority
           </label>
-          <select
-            className="w-full rounded-md"
-            id="priority"
-            {...register('priority')}
-          >
+          <select className="w-full rounded-md" id="priority" {...register("priority")}>
             <option defaultValue value="high">
               High
             </option>
@@ -94,11 +78,7 @@ const AddTaskModal = ({ isOpen, setIsOpen }) => {
           </select>
         </div>
         <div className="flex gap-3 justify-end">
-          <button
-            onClick={() => onCancel()}
-            type="button"
-            className="btn btn-danger "
-          >
+          <button onClick={() => onCancel()} type="button" className="btn btn-danger ">
             Cancel
           </button>
           <button type="submit" className="btn btn-primary ">
